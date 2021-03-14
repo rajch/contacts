@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package contacts;
+option go_package="github.com/rajch/contacts/pkg/grpc";
+
+message Contact {
+    int32  Id    = 1;
+    string Name  = 2;
+    string Phone = 3;
+    string Email = 4;
+    string City  = 5;
+    int32  Age   = 6;
+}
+
+message GetContactInput {
+    int32  Id    = 1;
+}
+
+service ContactService {
+    rpc New(Contact) returns (Contact);
+    rpc Get(GetContactInput) returns (Contact);
+}
