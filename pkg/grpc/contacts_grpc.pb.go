@@ -7,6 +7,7 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -18,8 +19,9 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ContactServiceClient interface {
-	New(ctx context.Context, in *Contact, opts ...grpc.CallOption) (*Contact, error)
-	Get(ctx context.Context, in *GetContactInput, opts ...grpc.CallOption) (*Contact, error)
+	NewContact(ctx context.Context, in *Contact, opts ...grpc.CallOption) (*Contact, error)
+	GetAllContacts(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (ContactService_GetAllContactsClient, error)
+	GetContactById(ctx context.Context, in *GetContactInput, opts ...grpc.CallOption) (*Contact, error)
 }
 
 type contactServiceClient struct {
@@ -30,18 +32,50 @@ func NewContactServiceClient(cc grpc.ClientConnInterface) ContactServiceClient {
 	return &contactServiceClient{cc}
 }
 
-func (c *contactServiceClient) New(ctx context.Context, in *Contact, opts ...grpc.CallOption) (*Contact, error) {
+func (c *contactServiceClient) NewContact(ctx context.Context, in *Contact, opts ...grpc.CallOption) (*Contact, error) {
 	out := new(Contact)
-	err := c.cc.Invoke(ctx, "/contacts.ContactService/New", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/contacts.ContactService/NewContact", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *contactServiceClient) Get(ctx context.Context, in *GetContactInput, opts ...grpc.CallOption) (*Contact, error) {
+func (c *contactServiceClient) GetAllContacts(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (ContactService_GetAllContactsClient, error) {
+	stream, err := c.cc.NewStream(ctx, &ContactService_ServiceDesc.Streams[0], "/contacts.ContactService/GetAllContacts", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &contactServiceGetAllContactsClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type ContactService_GetAllContactsClient interface {
+	Recv() (*Contact, error)
+	grpc.ClientStream
+}
+
+type contactServiceGetAllContactsClient struct {
+	grpc.ClientStream
+}
+
+func (x *contactServiceGetAllContactsClient) Recv() (*Contact, error) {
+	m := new(Contact)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+func (c *contactServiceClient) GetContactById(ctx context.Context, in *GetContactInput, opts ...grpc.CallOption) (*Contact, error) {
 	out := new(Contact)
-	err := c.cc.Invoke(ctx, "/contacts.ContactService/Get", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/contacts.ContactService/GetContactById", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -52,8 +86,9 @@ func (c *contactServiceClient) Get(ctx context.Context, in *GetContactInput, opt
 // All implementations must embed UnimplementedContactServiceServer
 // for forward compatibility
 type ContactServiceServer interface {
-	New(context.Context, *Contact) (*Contact, error)
-	Get(context.Context, *GetContactInput) (*Contact, error)
+	NewContact(context.Context, *Contact) (*Contact, error)
+	GetAllContacts(*emptypb.Empty, ContactService_GetAllContactsServer) error
+	GetContactById(context.Context, *GetContactInput) (*Contact, error)
 	mustEmbedUnimplementedContactServiceServer()
 }
 
@@ -61,11 +96,14 @@ type ContactServiceServer interface {
 type UnimplementedContactServiceServer struct {
 }
 
-func (UnimplementedContactServiceServer) New(context.Context, *Contact) (*Contact, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method New not implemented")
+func (UnimplementedContactServiceServer) NewContact(context.Context, *Contact) (*Contact, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method NewContact not implemented")
 }
-func (UnimplementedContactServiceServer) Get(context.Context, *GetContactInput) (*Contact, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Get not implemented")
+func (UnimplementedContactServiceServer) GetAllContacts(*emptypb.Empty, ContactService_GetAllContactsServer) error {
+	return status.Errorf(codes.Unimplemented, "method GetAllContacts not implemented")
+}
+func (UnimplementedContactServiceServer) GetContactById(context.Context, *GetContactInput) (*Contact, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetContactById not implemented")
 }
 func (UnimplementedContactServiceServer) mustEmbedUnimplementedContactServiceServer() {}
 
@@ -80,38 +118,59 @@ func RegisterContactServiceServer(s grpc.ServiceRegistrar, srv ContactServiceSer
 	s.RegisterService(&ContactService_ServiceDesc, srv)
 }
 
-func _ContactService_New_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _ContactService_NewContact_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Contact)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ContactServiceServer).New(ctx, in)
+		return srv.(ContactServiceServer).NewContact(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/contacts.ContactService/New",
+		FullMethod: "/contacts.ContactService/NewContact",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ContactServiceServer).New(ctx, req.(*Contact))
+		return srv.(ContactServiceServer).NewContact(ctx, req.(*Contact))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _ContactService_Get_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _ContactService_GetAllContacts_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(emptypb.Empty)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(ContactServiceServer).GetAllContacts(m, &contactServiceGetAllContactsServer{stream})
+}
+
+type ContactService_GetAllContactsServer interface {
+	Send(*Contact) error
+	grpc.ServerStream
+}
+
+type contactServiceGetAllContactsServer struct {
+	grpc.ServerStream
+}
+
+func (x *contactServiceGetAllContactsServer) Send(m *Contact) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func _ContactService_GetContactById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetContactInput)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ContactServiceServer).Get(ctx, in)
+		return srv.(ContactServiceServer).GetContactById(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/contacts.ContactService/Get",
+		FullMethod: "/contacts.ContactService/GetContactById",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ContactServiceServer).Get(ctx, req.(*GetContactInput))
+		return srv.(ContactServiceServer).GetContactById(ctx, req.(*GetContactInput))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -124,14 +183,20 @@ var ContactService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*ContactServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "New",
-			Handler:    _ContactService_New_Handler,
+			MethodName: "NewContact",
+			Handler:    _ContactService_NewContact_Handler,
 		},
 		{
-			MethodName: "Get",
-			Handler:    _ContactService_Get_Handler,
+			MethodName: "GetContactById",
+			Handler:    _ContactService_GetContactById_Handler,
 		},
 	},
-	Streams:  []grpc.StreamDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "GetAllContacts",
+			Handler:       _ContactService_GetAllContacts_Handler,
+			ServerStreams: true,
+		},
+	},
 	Metadata: "contacts.proto",
 }
