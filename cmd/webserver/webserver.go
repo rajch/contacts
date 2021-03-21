@@ -86,11 +86,17 @@ func main() {
 
 	})
 
+	// Comment out the next line if you want to use TLS
 	r.Run("localhost:8080")
+	// Uncomment the next line if you want to use TLS
 	// r.RunTLS("localhost:8080", "ws.crt", "ws.key")
+	// Before you uncomment the previous line,
+	// 	make sure you have generated the ws.crt and ws.key files
 }
 
 func getrepo() (contact.Repository, error) {
-	//return filerepo.New("testdb.db.json")
+	// Comment out the next line if you want to use the file repo
 	return gormrepo.New("testdb.db")
+	// Uncomment the next line if you want to use the file repo
+	// return filerepo.New("testdb.db.json")
 }

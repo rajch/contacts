@@ -98,6 +98,8 @@ func (cs *contactServer) GetContactById(_ context.Context, ci *grpc.GetContactIn
 }
 
 func getrepo() (contact.Repository, error) {
-	//return filerepo.New("testdb.db.json")
+	// Comment out the next line if you want to use the file repo
 	return gormrepo.New("testdb.db")
+	// Uncomment the next line if you want to use the file repo
+	// return filerepo.New("testdb.db.json")
 }

@@ -1,0 +1,27 @@
+[req]
+# Distinguished name attributes to be picked up directly from the 
+# named section in this file. No prompting.
+distinguished_name = req_distinguished_name
+prompt = no
+
+# Extensions required for a self-signed certificate
+x509_extensions	= self_signed_cert_extensions
+
+[req_distinguished_name]
+C  = IN
+O  = AASampleOrg
+OU = GoTraining
+CN = localhost
+
+[self_signed_cert_extensions]
+subjectKeyIdentifier=hash
+authorityKeyIdentifier=keyid:always,issuer
+
+# This attibute makes this certificate a CA, and hence self-signed 
+basicConstraints = critical,CA:true
+
+# This attribute picks up SAN values from the named section
+subjectAltName = @alt_names
+
+[alt_names]
+DNS.1  =  localhost
