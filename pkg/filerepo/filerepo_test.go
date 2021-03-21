@@ -1,20 +1,20 @@
-package gormrepo_test
+package filerepo_test
 
 import (
 	"testing"
 
 	"github.com/rajch/contacts/pkg/contact/contacttest"
-	"github.com/rajch/contacts/pkg/gormrepo"
+	"github.com/rajch/contacts/pkg/filerepo"
 )
 
-func TestGormrepo(t *testing.T) {
-	g, err := gormrepo.New("testdb.db")
+func TestFilerepo(t *testing.T) {
+	fr, err := filerepo.New("testdb.db.json")
 	if err != nil {
-		t.Fatalf("Could not open database: %v.", err)
+		t.Fatalf("Could not open file: %v.", err)
 	}
-	defer g.Close()
+	defer fr.Close()
 
-	contacttest.TestRepository(t, g)
+	contacttest.TestRepository(t, fr)
 
 	// c1 := contact.Contact{
 	// 	Name: "First Contact",
@@ -45,7 +45,7 @@ func TestGormrepo(t *testing.T) {
 
 	// t.Log("Testing List...")
 
-	// allcontacts, err := g.List()
+	// allcontacts, _ := g.List()
 	// if len(allcontacts) < 2 {
 	// 	t.Fatal("Number of inserted records do not match.")
 	// }
@@ -85,7 +85,7 @@ func TestGormrepo(t *testing.T) {
 	// var c3 contact.Contact
 	// c3 = *gpc1
 	// c3.Id = 5678
-	// gpc3, err = g.Update(&c3)
+	// _, err = g.Update(&c3)
 	// if err == nil {
 	// 	t.Fatalf("Invalid update was allowed.")
 	// }

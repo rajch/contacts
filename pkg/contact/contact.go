@@ -8,12 +8,3 @@ type Contact struct {
 	City  string
 	Age   int
 }
-
-type ContactRepository interface {
-	New(*Contact) (*Contact, error)
-	Update(*Contact) (*Contact, error)
-	Delete(*Contact) error
-
-	Get(uint) (*Contact, error)
-	List() ([]*Contact, error)
-}

@@ -5,6 +5,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/rajch/contacts/pkg/contact"
+
+	// "github.com/rajch/contacts/pkg/filerepo"
 	"github.com/rajch/contacts/pkg/gormrepo"
 )
 
@@ -16,7 +18,7 @@ func main() {
 	})
 
 	r.GET("/contacts", func(c *gin.Context) {
-		g, err := gormrepo.NewGormrepo("testdb.db")
+		g, err := getrepo()
 		if err != nil {
 			c.AbortWithError(500, err)
 			return
@@ -42,7 +44,7 @@ func main() {
 
 		idparamuint := uint(idparam)
 
-		g, err := gormrepo.NewGormrepo("testdb.db")
+		g, err := getrepo()
 		if err != nil {
 			c.AbortWithError(500, err)
 			return
@@ -67,7 +69,7 @@ func main() {
 			c.AbortWithError(500, err)
 		}
 
-		g, err := gormrepo.NewGormrepo("testdb.db")
+		g, err := getrepo()
 		if err != nil {
 			c.AbortWithError(500, err)
 			return
@@ -84,5 +86,11 @@ func main() {
 
 	})
 
-	r.RunTLS("localhost:8080", "ws.crt", "ws.key")
+	r.Run("localhost:8080")
+	// r.RunTLS("localhost:8080", "ws.crt", "ws.key")
+}
+
+func getrepo() (contact.Repository, error) {
+	//return filerepo.New("testdb.db.json")
+	return gormrepo.New("testdb.db")
 }

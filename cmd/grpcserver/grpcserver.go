@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/rajch/contacts/pkg/contact"
+	// "github.com/rajch/contacts/pkg/filerepo"
 	"github.com/rajch/contacts/pkg/gormrepo"
 	"github.com/rajch/contacts/pkg/grpc"
 	"google.golang.org/grpc/codes"
@@ -23,7 +24,7 @@ func (cs *contactServer) NewContact(_ context.Context, c *grpc.Contact) (*grpc.C
 		City:  c.City,
 		Age:   int(c.Age),
 	}
-	g, err := gormrepo.NewGormrepo("testdb.db")
+	g, err := getrepo()
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
@@ -46,7 +47,7 @@ func (cs *contactServer) NewContact(_ context.Context, c *grpc.Contact) (*grpc.C
 }
 
 func (cs *contactServer) GetAllContacts(_ *emptypb.Empty, stream grpc.ContactService_GetAllContactsServer) error {
-	g, err := gormrepo.NewGormrepo("testdb.db")
+	g, err := getrepo()
 	if err != nil {
 		return status.Error(codes.Internal, err.Error())
 	}
@@ -75,7 +76,7 @@ func (cs *contactServer) GetAllContacts(_ *emptypb.Empty, stream grpc.ContactSer
 }
 
 func (cs *contactServer) GetContactById(_ context.Context, ci *grpc.GetContactInput) (*grpc.Contact, error) {
-	g, err := gormrepo.NewGormrepo("testdb.db")
+	g, err := getrepo()
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
@@ -94,4 +95,9 @@ func (cs *contactServer) GetContactById(_ context.Context, ci *grpc.GetContactIn
 		City:  contact.City,
 		Age:   int32(contact.Age),
 	}, nil
+}
+
+func getrepo() (contact.Repository, error) {
+	//return filerepo.New("testdb.db.json")
+	return gormrepo.New("testdb.db")
 }

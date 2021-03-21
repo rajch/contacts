@@ -11,7 +11,7 @@ type Gormrepo struct {
 	db       *gorm.DB
 }
 
-func NewGormrepo(fn string) (*Gormrepo, error) {
+func New(fn string) (contact.Repository, error) {
 	db, err := gorm.Open("sqlite3", fn)
 	if err != nil {
 		return nil, err
