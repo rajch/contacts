@@ -10,4 +10,4 @@ A sample Go project created during a training. It includes simple examples of th
 * TLS use in Gin
 * A simple GRPC client and server
 
-Eventually, it will be properly documented and annotated. (Commitment made on 2021-03-21)
+Each package and executable directory has a README.md file which describes the example in detail.
